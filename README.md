@@ -26,6 +26,16 @@ Clone this project. Go to project root folder, then install the required librari
 ```
 pip install -r requirements.txt
 ```
+### Install AWK utility [For Windows OS only]
+```
+choco install awk
+```
+OR
+```
+scoop install gawk
+```
+OR  
+Download from [GnuWin32 site](https://gnuwin32.sourceforge.net/packages/gawk.htm) and add it to environment variable path.
 
 ## Run
 ```

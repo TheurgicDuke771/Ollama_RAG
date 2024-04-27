@@ -10,13 +10,16 @@ Our tech stack is super easy with Langchain, Ollama, and Streamlit.
 * **Chat UI:** The user interface is also an important component. Although there are many technologies available, I prefer using Streamlit, a Python library, for peace of mind.
 
 ## Setup Ollama
-As mentioned above, setting up and running Ollama is straightforward. First, visit [ollama website](ollama.com) and download the app appropriate for your operating system.
+As mentioned above, setting up and running Ollama is straightforward. First, visit [ollama website](https://ollama.com) and download the app appropriate for your operating system.
 
 ## Install any Ollama model
 ```
 ollama pull llama3
 ```
-Afterward, run `ollama list` to verify if the model was pulled correctly.
+Afterward, run the below command to verify if the model was pulled correctly.  
+```
+ollama list
+```
 
 ## Setup
 Clone this project. Go to project root folder, then install the required libraries:
@@ -29,11 +32,8 @@ pip install -r requirements.txt
 streamlit run rag_webpage_st.py
 ```
 
-A webpage will open on port 8501, where user need to select the ollama model and website URL. Then in the chatbox questions can be asked:
-
-```
-What is the purpose of LHC?
-```
+A webpage will open on port 8501, where user need to select the ollama model and website URL. Then in the chatbox questions can be asked:  
+i.e. - for LHC wikipedia page `What is the purpose of LHC?`
 
 ## Screenshot
 ![screenshot of the application](image.png)

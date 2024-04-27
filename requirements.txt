@@ -1,0 +1,9 @@
+beautifulsoup4
+chromadb
+gpt4all
+langchain
+langchain-community
+requests
+streamlit
+streamlit_chat
+

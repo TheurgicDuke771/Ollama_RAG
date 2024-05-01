@@ -1,7 +1,7 @@
-import os
 import subprocess
 import streamlit as st
 from streamlit_chat import message
+from streamlit_tags import st_tags
 from rag_webpage import RagWebpage
 
 
@@ -25,13 +25,13 @@ def process_input():
 		st.session_state["messages"].append((agent_text, False))
 
 
-def read_webpage(model:str, url:str):
+def read_webpage(model:str, url_list:str):
 	st.session_state["assistant"].clear()
 	st.session_state["messages"] = []
 	st.session_state["user_input"] = ""
 
-	with st.session_state["ingestion_spinner"], st.spinner(f'Ingesting {url}'):
-		st.session_state["assistant"].ingest(model, url)
+	with st.session_state["ingestion_spinner"], st.spinner(f'Ingesting {url_list}'):
+		st.session_state["assistant"].ingest(model, url_list)
 
 
 def page():
@@ -49,14 +49,14 @@ def page():
 
 	with st.form("user_input_form"):
 		model_name = st.selectbox(label="Select You Model", options=model_list, index=None)
-		web_url = st.text_input(label="Enter a Web Page URL", placeholder="e.g. - https://en.wikipedia.org/wiki/Mango")
+		web_urls = st_tags(label="Enter the Web Page URL(s)", text="Hint: Press enter to add multiple URL")
 		submit = st.form_submit_button('Submit')
 	
 	if submit:
 		# Validate inputs
-		if not model_name or not web_url or web_url == "":
+		if not model_name or len(web_urls) == 0:
 			st.error('Please insert valid inputs', icon="🚨")
-		read_webpage(model=model_name, url=web_url)
+		read_webpage(model=model_name, url_list=web_urls)
 	
 	st.session_state["ingestion_spinner"] = st.empty()
 

@@ -45,18 +45,21 @@ class RagWebpage:
 		)
 		self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
 
-	def ingest(self, model:str, web_url: str):
-		resp = requests.get(url=web_url)
-		if resp.status_code >= 300:
-			raise Exception("Invalid URL")
-		else:
-			self.web_page_url = web_url
+	def ingest(self, model:str, web_url_list: list[str]):
+		data = []
+		for web_url in web_url_list:
+			resp = requests.get(url=web_url)
+			if resp.status_code >= 300:
+				raise Exception("Invalid URL")
+			else:
+				# load the webpage 
+				loader = WebBaseLoader(web_path=web_url)
+				docs = loader.load()
+				data.extend(docs)
 
 		self.llm = Ollama(model=model, callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
 
-		# load the webpage and split it into chunks
-		loader = WebBaseLoader(web_path=self.web_page_url)
-		data = loader.load()
+		#Split the webpage content into chunks
 		all_splits = self.text_splitter.split_documents(data)
 		with SuppressStdout():
 			vectorstore = Chroma.from_documents(documents=all_splits, embedding=GPT4AllEmbeddings())

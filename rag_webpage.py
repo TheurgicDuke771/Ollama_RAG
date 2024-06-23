@@ -45,39 +45,42 @@ class RagWebpage:
 		)
 		self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
 
-	def ingest(self, model:str, web_url_list: list[str]):
+	def ingest(self, ollama_server: str, ollama_model: str, embeddings_model: str, web_url_list: list[str]):
 		data = []
 		for web_url in web_url_list:
 			resp = requests.get(url=web_url)
 			if resp.status_code >= 300:
 				raise Exception("Invalid URL")
 			else:
-				# load the webpage 
+				# load the webpage
 				loader = WebBaseLoader(web_path=web_url)
 				docs = loader.load()
 				data.extend(docs)
 
-		self.llm = Ollama(model=model, callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
+		self.llm = Ollama(
+			base_url=ollama_server,
+			model=ollama_model,
+			callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
+		)
 
-		#Split the webpage content into chunks
+		# Split the webpage content into chunks
 		all_splits = self.text_splitter.split_documents(data)
 		with SuppressStdout():
-			vectorstore = Chroma.from_documents(documents=all_splits, embedding=GPT4AllEmbeddings())
+			vectorstore = Chroma.from_documents(
+				documents=all_splits, embedding=GPT4AllEmbeddings(model_name=embeddings_model)
+			)
 
-		self.retriever=vectorstore.as_retriever(
+		self.retriever = vectorstore.as_retriever(
 			search_type="similarity_score_threshold",
 			search_kwargs={
 				"k": 3,
 				"score_threshold": 0.5,
-			}
+			},
 		)
 
 		# Chain
 		self.qa_chain = (
-			{"context": self.retriever, "question": RunnablePassthrough()}
-			| self.prompt
-			| self.llm
-			| StrOutputParser()
+			{"context": self.retriever, "question": RunnablePassthrough()} | self.prompt | self.llm | StrOutputParser()
 		)
 
 	def ask(self, query: str) -> str:
@@ -89,4 +92,3 @@ class RagWebpage:
 		self.vectorstore = None
 		self.retriever = None
 		self.qa_chain = None
-

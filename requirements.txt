@@ -6,4 +6,4 @@ langchain-community
 requests
 streamlit
 streamlit_chat
-
+streamlit_tags
